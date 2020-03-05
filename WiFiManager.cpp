@@ -316,6 +316,15 @@ boolean WiFiManager::autoConnect(char const *apName, char const *apPassword) {
     DEBUG_WM(F("AutoConnect: SUCCESS"));
     DEBUG_WM(F("STA IP Address:"),WiFi.localIP());
     _lastconxresult = WL_CONNECTED;
+	  
+    DEBUG_WM(DEBUG_VERBOSE,"restoring usermode",getModeString(_usermode));
+    WiFi_Mode(_usermode); // restore users wifi mode, BUG https://github.com/esp8266/Arduino/issues/4372
+    if(WiFi.status()==WL_IDLE_STATUS){
+      WiFi.reconnect(); // restart wifi since we disconnected it in startconfigportal
+      DEBUG_WM(DEBUG_VERBOSE,"WiFi Reconnect, was idle");
+    }
+    DEBUG_WM(DEBUG_VERBOSE,"wifi status:",getWLStatusString(WiFi.status()));
+    DEBUG_WM(DEBUG_VERBOSE,"wifi mode:",getModeString(WiFi.getMode()));
 
     if((String)_hostname != ""){
       #ifdef ESP8266
